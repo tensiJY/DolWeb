@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shopManager">
+	<!-- 	대카테고리 검색 질의 명령 -->
+	<select id="selectLCate"		resultType="smVO">
+		SELECT
+			c_Code		AS code,
+			c_Name	AS name,
+			c_Date		AS wday
+		FROM
+			Category
+		WHERE
+			c_Code LIKE '____'
+	</select>
+
+	<!-- 	대카테고리 등록 질의 명령 -->
+	<insert	id="LcateInsert"	parameterType="string">
+		INSERT
+		INTO
+			Category
+		VALUES
+			((SELECT LPAD(TO_NUMBER(NVL(MAX(c_Code), '0')) + 1, 4, '0') FROM Category WHERE c_Code LIKE '____'), 
+			#{lname}, SYSDATE)
+	</insert>
+	
+	<!-- 	중카테고리 등록 질의 명령 -->
+	<insert	id="McateInsert"		parameterType="hMap">
+		INSERT
+		INTO
+			Category
+		VALUES
+			((SELECT #{lcate} || LPAD(TO_NUMBER(NVL(MAX(SUBSTR(c_Code, 5)), '0')) + 1, 4, '0')
+		FROM
+			Category
+		WHERE
+			c_Code LIKE #{lcate} || '____'),
+			#{mname}, SYSDATE)
+	</insert>
+	
+	<!-- 	소카테고리 등록 질의 명령 -->
+	<insert	id="ScateInsert"		parameterType="hMap">
+		INSERT
+		INTO
+			Category
+		VALUES
+			((SELECT #{mcate} || LPAD(TO_NUMBER(NVL(MAX(SUBSTR(c_Code, -4)), '0')) + 1, 4, '0')
+		FROM
+			Category
+		WHERE
+			c_Code LIKE #{mcate} || '____'),
+			#{sname}, SYSDATE)
+	</insert>
+	
+	<!-- 	중카테고리 검색 질의 명령 -->
+	<select id="selectMCate"	parameterType="string" 	resultType="smVO">
+		SELECT
+			c_Code		AS code,
+			c_Name	AS name,
+			c_Date		AS wday
+		FROM
+			Category
+		WHERE
+			c_Code LIKE #{lcode} || '____' 
+	</select>
+
+	<!-- 	소카테고리 검색 질의 명령 -->
+	<select id="selectSCate"	parameterType="string" 	resultType="smVO">
+		SELECT
+			c_Code		AS code,
+			c_Name	AS name,
+			c_Date		AS wday
+		FROM
+			Category
+		WHERE
+			c_Code LIKE #{mcode} || '____' 
+	</select>
+	
+	<!-- 	상품 등록 질의 명령 -->
+	<insert id="insertGoods"		parameterType="smVO">
+		INSERT
+		INTO
+			GoodsInfo
+		VALUES
+			((SELECT NVL(MAX(gi_Code), 0) + 1 FROM GoodsInfo), 
+			#{scode}, #{name}, #{maker}, #{price}, #{detail}, #{saveName})
+	</insert>
+	
+	<!-- 	상품 검색 질의 -->
+	<select id="goodsList"	resultType="smVO"	parameterType="string">
+		SELECT
+			gi_Code			AS code,
+			gi_Category		AS cate,
+			c_Name			AS sname,
+			gi_Name			AS name,
+			gi_Maker			AS maker,
+			gi_Price			AS price,
+			gi_Detail			AS detail,
+			gi_GoodsImage	AS saveName
+		FROM
+			GoodsInfo, Category
+		WHERE
+					gi_Category LIKE #{code}
+			AND 	gi_Category = c_Code
+	</select>
+</mapper>
+
+
+
+
+
+
+
+

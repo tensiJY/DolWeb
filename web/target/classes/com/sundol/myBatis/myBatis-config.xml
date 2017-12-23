@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC 
+	"-//mybatis.org//DTD Config 3.0//EN" 
+	"HTTP://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>	
+		<setting name="cacheEnabled" 		value="false" />
+		<setting name="useGeneratedKeys" 	value="true" />
+		<setting name="defaultExecutorType" value="REUSE" />
+	</settings>
+	<!-- 	기록할 형태의 별칭을 지정하는 부분이다. -->
+	<typeAliases>
+		<typeAlias alias="int"		type="java.lang.Integer" />
+		<typeAlias alias="String"		type="java.lang.String" />
+		<typeAlias alias="hMap"		type="java.util.HashMap" />
+		<typeAlias alias="abVO"		type="com.sundol.VO.AnBoardVO" />
+		<typeAlias alias="fVO"		type="com.sundol.VO.FileBoardVO" />
+		<typeAlias alias="smVO"		type="com.sundol.VO.ShopManagerVO" />
+	</typeAliases>
+	<!-- 	만들어진 SQL 파일을 등록하는 부분이다. -->
+	<mappers>
+		<mapper resource="/com/sundol/SQL/LoginSQL.xml" />
+		<mapper resource="/com/sundol/SQL/AnBoardSQL.xml" />
+		<mapper resource="/com/sundol/SQL/FileBoardSQL.xml" />
+		<mapper resource="/com/sundol/SQL/ShopManagerSQL.xml" />
+	</mappers>
+</configuration>
+
+
+
+
+
