@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+							http://www.springframework.org/schema/context 
+							http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 	자동 주입이 가능하도록 선언 -->
+	<context:annotation-config />
+	
+	<!-- 	JSON 문서 변환 라이브러리 등록 -->
+	<bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+
+	<!-- 	컨넥션 풀 등록 -->	
+	<bean id="BaseBDDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521:orcl" />
+		<property name="username" value="scott" />
+		<property name="password" value="tiger" />
+	</bean>  
+
+	<!-- 	myBatis 등록
+			사용할 컨넥션 풀과 연결해 놓았다.
+	-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" >
+			<value>classpath:/com/sundol/myBatis/myBatis-config.xml</value>
+		</property>
+		<property name="dataSource" ref="BaseBDDataSource" />
+	</bean>  
+	
+	<!-- 	myBatis에서 사용 세션을 <bean> 처리 해 놓았다. -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>	
+	
+	<!-- 라이브러리 빈 선언-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!--파일 업로드 환경 설정-->  
+    	<property name="maxUploadSize" value="1000000000" />
+        <property name="maxInMemorySize" value="1000000000" />
+		<property name="defaultEncoding" value="UTF-8" />
+    </bean>	
+	
+	
+	<!-- 만들어진 DAO를 자동 주입하기 위한 bean 선언 -->
+	<bean id="loginDAO" class="com.sundol.DAO.LoginDAO">
+	<!-- 	자동 주입을 할때 위에서 설정한 컨넥션을 필요로 하고 있기 때문에
+			이것을 등록해서 주입되도록 해 놓는다.
+	-->
+		<property name="sqlSessionTemplate" ref="sqlSession" />
+	</bean>
+	<bean id="anBoardDAO" class="com.sundol.DAO.AnBoardDAO">
+		<property name="sqlSessionTemplate" ref="sqlSession" />
+	</bean>
+	<bean id="fileDAO" class="com.sundol.DAO.FileBoardDAO">
+		<property name="sqlSessionTemplate" ref="sqlSession" />
+	</bean>
+	<bean id="smDAO" class="com.sundol.DAO.ShopManagerDAO">
+		<property name="sqlSessionTemplate" ref="sqlSession" />
+	</bean>
+	
+			
+	<!-- 만들어진 서비스 클래스를 자동 주입하기 위한 bean 선언 -->
+	<bean id="loginS" class="com.sundol.Service.LoginService" />
+	<bean id="anBoardS" class="com.sundol.Service.AnBoardService" />
+	<bean id="fileBoardS" class="com.sundol.Service.FileBoardService" />
+	<bean id="smS" class="com.sundol.Service.ShopManagerService" />
+	
+	
+	<!-- 	사용자 뷰로 사용할 클래스를 bean 선언 -->
+	<bean id="download" class="com.sundol.UTIL.DownloadView" />
+</beans>
+
+
